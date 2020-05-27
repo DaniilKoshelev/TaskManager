@@ -1,0 +1,53 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+}
+
+.table.table-dark {
+    min-height: 256px;
+    width: 80%;
+    margin: 20px auto;
+    border-radius: 15px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.pagination-container {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.page-item .page-link {
+    background-color: #343a40;
+    text-align: center;
+    color: white;
+    transition: all 0.1s linear 0s;
+}
+
+.page-item:nth-child(2) {
+    width: 100px;
+}
+
+.page-item:nth-child(2) .page-link:hover {
+    color: white;
+    background-color: #343a40;
+}
+
+tr {
+    height: 64px;
+}
+
+#new-task {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    width: 50%;
+}
+
+.form-group {
+    width: 80%;
+}

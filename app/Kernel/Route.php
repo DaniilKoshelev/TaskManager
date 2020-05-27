@@ -1,59 +1,25 @@
 <?php
-//hardcode in this file!
-namespace App\Kernel;
 
-use App\Controllers\HomeController;
+namespace App\Kernel;
 
 class Route
 {
     static function start() {
-        // Default
-        //TODO: Get rid of Controller word
+        $url = explode('?', $_SERVER['REQUEST_URI'], 2)[0]; //TODO: FIX
 
-        $controller = 'HomeController';
-        $action = 'index';
+        $routes = explode('/', $url);
 
-//        $routes = explode('/', $_SERVER['REQUEST_URI']);
-//
-//        // получаем имя контроллера
-//        if (!empty($routes[1])) {
-//            $controller = $routes[1];
-//        }
-//
-//        // получаем имя экшена
-//        if (!empty($routes[2])) {
-//            $action = $routes[2];
-//        }
-//
-//        // добавляем префиксы
-//
-//        // подцепляем файл с классом модели (файла модели может и не быть)
-//
-//
-        // подцепляем файл с классом контроллера
-        $controllerFile = $controller . '.php';
-        $controllerPath = "../Controllers/" . $controllerFile;
-        $controllerClass = "App/Controllers/HomeController";
+        $controllerName = $routes[3] ?? 'Home';
+        $action = $routes[4] ??'index';
 
-        if(file_exists($controllerPath)) {
-            require $controllerPath;
-        }
-//        else {
-//            //TODO: Excpetion
-//            Route::ErrorPage404();
-//        }
+        $controllerClass = "App\Controllers\\$controllerName" . 'Controller';
+        $controller = new $controllerClass;
 
-        echo 1;
-        $controller = new HomeController();
-
-        if(method_exists($controller, $action)) {
+        if(method_exists($controllerClass, $action)) {
             $controller->$action();
         } else {
-            //TODO: Excpetion
             Route::ErrorPage404();
         }
-
-
     }
 
     public static function ErrorPage404() {

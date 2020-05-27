@@ -2,15 +2,15 @@
 
 namespace App\Kernel;
 
-class Controller
+abstract class Controller
 {
-    public $view;
+    protected $requestJSON;
 
-    function __construct() {
-        $this->view = new View();
+    public function __construct() {
+        $this->requestJSON = json_decode(file_get_contents('php://input'));
     }
 
-    function index() {
-
+    public function sendJsonResponse($obj) {
+        echo json_encode($obj);
     }
 }

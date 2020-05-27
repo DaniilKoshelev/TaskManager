@@ -1,7 +1,5 @@
 <?php
 
 return [
-    'controller' => [
-        'postfix' => 'Controller'
-    ]
+    'MAX_PAGE_COUNT' => 3
 ];
