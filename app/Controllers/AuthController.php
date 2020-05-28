@@ -7,19 +7,28 @@ use App\Kernel\Controller;
 
 class AuthController extends Controller
 {
-    const AUTHENTICATED_MESSAGE = 'Authenticated';
     const WRONG_CREDITS_ERROR = "Wrong credits";
+    const SESSION_ALREADY_ACTIVE_ERROR = "Session already acitve";
 
     public function login() {
-        if (Admin::attemptlogin($this->requestJSON->username, $this->requestJSON->password)) {
-            $this->sendJsonResponse(['message' => self::AUTHENTICATED_MESSAGE]);
-            session_start();
-        } else {
-            $this->sendJsonResponse(['error' => self::WRONG_CREDITS_ERROR]);
+        $error = self::SESSION_ALREADY_ACTIVE_ERROR;
+
+        if (!authorized()) {
+            if (Admin::attemptlogin($this->requestJSON->username, $this->requestJSON->password)) {
+                $this->sendJsonResponse(['authorized' => true]);
+                authorize();
+                return;
+            }
+            $error = self::WRONG_CREDITS_ERROR;
         }
+        $this->sendJsonResponse(['authorized' => false, 'error' => $error]);
     }
 
     public function logout() {
-        session_abort();
+        if (authorized()) deauthorize();
+    }
+
+    public function isAdmin() {
+        $this->sendJsonResponse(['isAdmin' => authorized()]);
     }
 }

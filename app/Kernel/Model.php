@@ -3,15 +3,13 @@
 namespace App\Kernel;
 
 use ArrayAccess;
+use PDO;
 use PDOException;
 
-abstract class Model implements ArrayAccess
+abstract class Model
 {
     public static $dbo;
     protected static $modelName;
-    protected $id;
-
-    abstract protected function fields();
 
     protected static function getSelect($select = null) {
         if(is_array($select)){
@@ -52,7 +50,6 @@ abstract class Model implements ArrayAccess
                     }
                 }
             }
-
             return $querySql;
         }
         return false;
@@ -61,51 +58,29 @@ abstract class Model implements ArrayAccess
     public static function query($sql) {
         try {
             $cat = static::$dbo->query($sql);
-            return $cat->fetchAll();
+            $table = [];
+            if ($cat) {
+                while ($row = $cat->fetch(PDO::FETCH_ASSOC)) {
+                    $table[] = $row;
+                }
+            }
+            return $table;
         } catch(PDOException $e) {
             echo $e->getMessage();
             exit;
         }
     }
 
-    public static function all() {
-        $modelName = static::$modelName;
-        $modelClass = "App\\$modelName";
-
-        $rows = static::query("SELECT * FROM " . $modelName);
-        $models = [];
-        foreach($rows as $row) {
-            $models[] = new $modelClass($row);
-        }
-        return $models;
+    public static function create($model) {
+        $properties = implode(',', array_keys($model));
+        $values = implode(',', array_map(function ($val) {return "\"$val\"";},array_values($model)));
+        $sql = 'INSERT INTO ' . static::$modelName . " ($properties) VALUES ($values)";
+        Model::$dbo->query($sql);
     }
 
-    public function save() {
-        $fields = implode(',', $this->fields());
-        $arr = [];
-
-        foreach ($this->fields() as $field) {
-            $arr[] = ($this->$field === "") ? "NULL" : "\"$this[$field]\"";
-        }
-        $values = implode(',', $arr);
-
-        $sql = 'INSERT INTO ' . static::$modelName . " ($fields) VALUES ($values)";
+    public static function update($id, $attributeName, $attributeValue) {
+        $select = self::getSelect(['where' => "ID = $id"]);
+        $sql = 'UPDATE ' . static::$modelName . ' SET ' . $attributeName . " = \"$attributeValue\" "  . $select;
         static::$dbo->query($sql);
-    }
-
-    public function offsetExists($offset) {
-        return property_exists(self::class, $offset);
-    }
-
-    public function offsetGet($offset) {
-        return $this->$offset;
-    }
-
-    public function offsetSet($offset, $value) {
-        $this->$offset = $value;
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->$offset);
     }
 }

@@ -17,4 +17,6 @@ $dbo = new PDO(
 
 Model::$dbo = $dbo;
 
+session_start();
+
 Route::start();

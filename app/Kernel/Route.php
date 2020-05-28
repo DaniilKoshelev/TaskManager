@@ -15,7 +15,7 @@ class Route
         $controllerClass = "App\Controllers\\$controllerName" . 'Controller';
         $controller = new $controllerClass;
 
-        if(method_exists($controllerClass, $action)) {
+        if (method_exists($controllerClass, $action)) {
             $controller->$action();
         } else {
             Route::ErrorPage404();

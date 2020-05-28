@@ -13,6 +13,12 @@ const task = {
             method: "POST",
             body: JSON.stringify(properties)
         });
+    },
+    update(id, attributeName, attributeValue) {
+        fetch("/TaskManager/public/Task/update", {
+            method: "POST",
+            body: JSON.stringify({id, attributeName, attributeValue: Number(attributeValue)})
+        })
     }
 };
 
