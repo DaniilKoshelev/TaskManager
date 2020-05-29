@@ -2,6 +2,7 @@ import pagination from "./pagination.js";
 import auth from "./auth.js";
 import task from "./task.js";
 import sort from "./sort";
+import * as constants from "./const";
 
 const pageNext = document.getElementById("page-next");
 const pagePrev = document.getElementById("page-prev");
@@ -19,7 +20,6 @@ const inputDescription =  document.getElementById("input-description");
 const sortFields = document.getElementById("sort-fields");
 
 function updatePage(page) {
-    console.log(page);
     tbody.textContent = "";
     page.forEach(taskItem => {
         Object.defineProperty(taskItem, "id", {enumerable: false});
@@ -31,10 +31,15 @@ function updatePage(page) {
         let td = document.createElement("td");
         let input = document.createElement("input");
         input.classList.add('input-description');
+        //input.id = "input-description" + taskItem.id;
         input.value = taskItem.description;
 
         input.addEventListener('change', e => {
-            task.update(taskItem.id, "description", e.target.value);
+            task.update(taskItem.id, "description", e.target.value).then(() => {
+                task.setTag(taskItem.id, constants.TAG_EDITED).then(() => {
+                    refreshPage();
+                });
+            });
         });
 
         td.appendChild(input);
@@ -54,15 +59,20 @@ function updatePage(page) {
 
         td = document.createElement("td");
         input = document.createElement("input");
+
         input.setAttribute("type", "checkbox");
         input.addEventListener("click", e => {
-            if (!auth.isAdmin) {
+            if (!auth.isAdmin || !e.target.checked) {
                 e.preventDefault();
             }
         });
 
         input.addEventListener("change", e => {
-            task.update(taskItem.id, "status", e.target.checked);
+            task.update(taskItem.id, "status", e.target.checked).then(() => {
+                task.setTag(taskItem.id, constants.TAG_COMPLETED).then(() => {
+                    refreshPage();
+                })
+            });
         });
 
         td.appendChild(input);
@@ -90,6 +100,17 @@ function refreshPage() {
     pagination.getPage(pagination.pageNumber, sort.filter).then(page => {
         updatePage(page);
     });
+}
+
+function clearInputTask() {
+    inputEmail.value = "";
+    inputUser.value = "";
+    inputDescription.value = "";
+}
+
+function clearInputLogin() {
+    inputUsername.value = "";
+    inputPassword.value = "";
 }
 
 function handleChangeCredential(e) { auth.changeCredential(e.target.name, e.target.value); }
@@ -123,8 +144,9 @@ btnLogin.addEventListener("click", function () {
     auth.login().then(res => {
         if (res.authorized) {
             authorize();
+            clearInputLogin();
         } else {
-            //Todo:
+            alert(res.error);
         }
     });
 });
@@ -136,11 +158,18 @@ btnLogout.addEventListener("click", function () {
 });
 
 btnSubmit.addEventListener('click', function () {
-    task.create();
-    refreshPage();
+    task.create().then(res => {
+        if (res) {
+            refreshPage();
+            clearInputTask();
+            alert(constants.MESSAGE_TASK_CREATED);
+        }
+        else alert(constants.ERROR_VALIDATION_CREATE_TASK);
+    })
 });
 
 sortFields.addEventListener("click", function (e) {
+    if (!e.target.dataset.value) return;
     sort.change(e.target.dataset.value);
     refreshPage();
 });

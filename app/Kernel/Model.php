@@ -11,58 +11,46 @@ abstract class Model
     public static $dbo;
     protected static $modelName;
 
+    //TODO: Refactor repeating code ()
     protected static function getSelect($select = null) {
-        if(is_array($select)){
-            $allQuery = array_keys($select);
-            array_walk($allQuery, function(&$val){
-                $val = strtoupper($val);
-            });
+        if (!is_array($select)) return false;
 
-            $querySql = "";
-            if(in_array("WHERE", $allQuery)){
-                foreach($select as $key => $val){
-                    if(strtoupper($key) == "WHERE"){
-                        $querySql .= " WHERE " . $val;
-                    }
-                }
-            }
+        $allQuery = array_keys($select);
+        array_walk($allQuery, function(&$val) { $val = strtoupper($val); });
 
-            if(in_array("GROUP", $allQuery)){
-                foreach($select as $key => $val){
-                    if(strtoupper($key) == "GROUP"){
-                        $querySql .= " GROUP BY " . $val;
-                    }
-                }
-            }
+        $querySql = '';
 
-            if(in_array("ORDER", $allQuery)){
-                foreach($select as $key => $val){
-                    if(strtoupper($key) == "ORDER"){
-                        $querySql .= " ORDER BY " . $val;
-                    }
-                }
-            }
+        if (in_array('WHERE', $allQuery))
+            foreach($select as $key => $val)
+                if (strtoupper($key) === 'WHERE')
+                    $querySql .= ' WHERE ' . $val;
 
-            if(in_array("LIMIT", $allQuery)){
-                foreach($select as $key => $val){
-                    if(strtoupper($key) == "LIMIT"){
-                        $querySql .= " LIMIT " . $val;
-                    }
-                }
-            }
-            return $querySql;
-        }
-        return false;
+        if (in_array('GROUP', $allQuery))
+            foreach($select as $key => $val)
+                if(strtoupper($key) === 'GROUP')
+                    $querySql .= ' GROUP BY ' . $val;
+
+        if (in_array('ORDER', $allQuery))
+            foreach($select as $key => $val)
+                if(strtoupper($key) === 'ORDER')
+                    $querySql .= ' ORDER BY ' . $val;
+
+        if (in_array('LIMIT', $allQuery))
+            foreach($select as $key => $val)
+                if(strtoupper($key) === 'LIMIT')
+                    $querySql .= ' LIMIT ' . $val;
+
+        return $querySql;
+
     }
 
-    public static function query($sql) {
+    protected static function query($sql) {
         try {
             $cat = static::$dbo->query($sql);
             $table = [];
             if ($cat) {
-                while ($row = $cat->fetch(PDO::FETCH_ASSOC)) {
+                while ($row = $cat->fetch(PDO::FETCH_ASSOC))
                     $table[] = $row;
-                }
             }
             return $table;
         } catch(PDOException $e) {
@@ -73,7 +61,7 @@ abstract class Model
 
     public static function create($model) {
         $properties = implode(',', array_keys($model));
-        $values = implode(',', array_map(function ($val) {return "\"$val\"";},array_values($model)));
+        $values = implode(',', array_map(function ($val) {return "\"$val\"";}, array_values($model)));
         $sql = 'INSERT INTO ' . static::$modelName . " ($properties) VALUES ($values)";
         Model::$dbo->query($sql);
     }

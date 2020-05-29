@@ -1,3 +1,5 @@
+import {ERROR_VALIDATION_LOGIN} from "./const";
+
 let credentials = {
     username: "",
     password: ""
@@ -10,15 +12,16 @@ const auth = {
         credentials[credential] = value
     },
     login() {
-        return fetch("/TaskManager/public/Auth/login", {
-            method: "POST",
-            body: JSON.stringify(credentials)
-        }).then(res => res.json()).then(response => {
-            if (response.authorized) {
+        if (inputValidated()) {
+            return fetch("/TaskManager/public/Auth/login", {
+                method: "POST",
+                body: JSON.stringify(credentials)
+            }).then(res => res.json()).then(response => {
                 isAdmin = true;
-            }
-            return response;
-        });
+                return response;
+            });
+        }
+        return new Promise(res => res({error: ERROR_VALIDATION_LOGIN}));
     },
     logout() {
         return fetch("/TaskManager/public/Auth/logout", {
@@ -36,5 +39,9 @@ const auth = {
         return isAdmin;
     }
 };
+
+function inputValidated() {
+    return (credentials.username !== "" && credentials.password !== "");
+}
 
 export default auth;

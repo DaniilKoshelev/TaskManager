@@ -4,8 +4,9 @@ namespace App\Kernel;
 
 class Route
 {
-    static function start() {
-        $url = explode('?', $_SERVER['REQUEST_URI'], 2)[0]; //TODO: FIX
+    //TODO: FIX CONSTANTS!
+    public static function start() {
+        $url = explode('?', $_SERVER['REQUEST_URI'], 2)[0];
 
         $routes = explode('/', $url);
 
@@ -15,14 +16,12 @@ class Route
         $controllerClass = "App\Controllers\\$controllerName" . 'Controller';
         $controller = new $controllerClass;
 
-        if (method_exists($controllerClass, $action)) {
-            $controller->$action();
-        } else {
-            Route::ErrorPage404();
-        }
+        if (method_exists($controllerClass, $action)) return $controller->$action();
+
+        return Route::ErrorPage404();
     }
 
-    public static function ErrorPage404() {
+    protected static function ErrorPage404() {
         $host = 'http://' . $_SERVER['HTTP_HOST'].'/';
         header('HTTP/1.1 404 Not Found');
         header("Status: 404 Not Found");

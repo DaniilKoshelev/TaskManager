@@ -19,9 +19,8 @@
         <th  scope="col">Description</th>
         <th data-value="User" scope="col">User</th>
         <th data-value="Email" scope="col">Email</th>
-        <th data-value="Status" scope="col">Status</th>
         <th scope="col">Tags</th>
-
+        <th data-value="Status" scope="col">Status</th>
     </tr>
     </thead>
     <tbody id="task-table">

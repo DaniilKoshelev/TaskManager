@@ -7,21 +7,15 @@ use App\Kernel\Controller;
 
 class AuthController extends Controller
 {
-    const WRONG_CREDITS_ERROR = "Wrong credits";
-    const SESSION_ALREADY_ACTIVE_ERROR = "Session already acitve";
-
     public function login() {
-        $error = self::SESSION_ALREADY_ACTIVE_ERROR;
-
-        if (!authorized()) {
-            if (Admin::attemptlogin($this->requestJSON->username, $this->requestJSON->password)) {
-                $this->sendJsonResponse(['authorized' => true]);
-                authorize();
-                return;
-            }
-            $error = self::WRONG_CREDITS_ERROR;
+        if (authorized()) {
+            return $this->sendJsonResponse(['authorized' => false, 'error' => error('SESSION_ALREADY_ACTIVE')]);
         }
-        $this->sendJsonResponse(['authorized' => false, 'error' => $error]);
+        if (Admin::attemptlogin($this->requestJSON->username, $this->requestJSON->password)) {
+            authorize();
+            return $this->sendJsonResponse(['authorized' => true]);
+        }
+        return $this->sendJsonResponse(['authorized' => false, 'error' => error('WRONG_CREDITS')]);
     }
 
     public function logout() {
@@ -29,6 +23,6 @@ class AuthController extends Controller
     }
 
     public function isAdmin() {
-        $this->sendJsonResponse(['isAdmin' => authorized()]);
+        return $this->sendJsonResponse(['isAdmin' => authorized()]);
     }
 }

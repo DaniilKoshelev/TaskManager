@@ -9,17 +9,35 @@ const task = {
         properties[property] = value
     },
     create() {
-        fetch("/TaskManager/public/Task/create", {
-            method: "POST",
-            body: JSON.stringify(properties)
-        });
+        if (inputValidated()) {
+            return fetch("/TaskManager/public/Task/create", {
+                method: "POST",
+                body: JSON.stringify(properties)
+            }).then(() => true);
+        }
+        return new Promise(res => res(false));
     },
     update(id, attributeName, attributeValue) {
-        fetch("/TaskManager/public/Task/update", {
+        return fetch("/TaskManager/public/Task/update", {
             method: "POST",
-            body: JSON.stringify({id, attributeName, attributeValue: Number(attributeValue)})
+            body: JSON.stringify({id, attributeName, attributeValue: attributeValue})
+        });
+    },
+    setTag(id, tagId) {
+        return fetch("/TaskManager/public/Task/setTag", {
+            method: "POST",
+            body: JSON.stringify({id, tagId})
         })
     }
 };
+
+function inputValidated() {
+    return (properties.user !== "" && properties.description !== "" && properties.email !== "" && validateEmail(properties.email))
+}
+
+function validateEmail(email) {
+    let pattern  = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return pattern.test(String(email).toLowerCase());
+}
 
 export default task;
