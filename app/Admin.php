@@ -10,8 +10,8 @@ class Admin extends Model
 
     public static function attemptLogin($username, $password) {
         $hash = md5($password);
-        $select = ['where' => "username = \"$username\" and password = \"$hash\""];
-        $sql = "SELECT * FROM " . self::$modelName . static::getSelect($select);
-        return (count(static::query($sql)) > 0);
+        $sql = 'SELECT * FROM ' . self::$modelName . " WHERE username = \"$username\" AND password = \"$hash\"";
+        $admins = static::query($sql);
+        return !empty($admins);
     }
 }

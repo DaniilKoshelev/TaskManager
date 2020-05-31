@@ -5,13 +5,14 @@ namespace App\Controllers;
 use App\Admin;
 use App\Kernel\Controller;
 
-class AuthController extends Controller
+class LoginController extends Controller
 {
     public function login() {
+        $request = $this->getRequestDataFromJson();
         if (authorized()) {
             return $this->sendJsonResponse(['authorized' => false, 'error' => error('SESSION_ALREADY_ACTIVE')]);
         }
-        if (Admin::attemptlogin($this->requestJSON->username, $this->requestJSON->password)) {
+        if (Admin::attemptlogin($request['username'], $request['password'])) {
             authorize();
             return $this->sendJsonResponse(['authorized' => true]);
         }

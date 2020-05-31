@@ -16,4 +16,10 @@ Model::$dbo = $dbo;
 
 session_start();
 
-echo Route::start();
+try {
+    echo Route::start();
+} catch (HttpRequestException $e) {
+    sendNotFoundError();
+} catch (Exception $e) {
+    echo error('WRONG_REQUEST');
+}

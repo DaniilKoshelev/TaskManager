@@ -1,3 +1,5 @@
+import {MAX_INPUT_LENGTH} from "./const.js";
+
 let properties = {
     user: "",
     email: "",
@@ -32,7 +34,14 @@ const task = {
 };
 
 function inputValidated() {
-    return (properties.user !== "" && properties.description !== "" && properties.email !== "" && validateEmail(properties.email))
+    return (properties.user !== ""
+        && properties.description !== ""
+        && properties.email !== ""
+        && validateEmail(properties.email)
+        && properties.description < MAX_INPUT_LENGTH
+        && properties.email < MAX_INPUT_LENGTH
+        && properties.user < MAX_INPUT_LENGTH
+    )
 }
 
 function validateEmail(email) {

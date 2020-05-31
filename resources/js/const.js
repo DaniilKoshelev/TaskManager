@@ -5,3 +5,5 @@ export const TAG_EDITED = 2;
 export const TAG_COMPLETED = 3;
 
 export const MESSAGE_TASK_CREATED = 'Info: The task was created successfully';
+
+export const MAX_INPUT_LENGTH = "255";

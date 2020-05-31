@@ -8,18 +8,10 @@ class Task extends Model
 {
     protected static $modelName = 'Task';
 
-    /**
-     * @param $number
-     * @param string $sort
-     * @return array
-     * @throws \Exception
-     */
     public static function getPage($number, $sort = 'ID ASC') {
         $maxPageCount = config('MAX_PAGE_COUNT');
 
-        $select = ['order' => "$sort"];
-        $sql = 'SELECT * FROM ' . self::$modelName . static::getSelect($select);
-
+        $sql = 'SELECT * FROM ' . self::$modelName . " ORDER BY $sort";
         $tasks = static::query($sql);
 
         foreach($tasks as &$task) {

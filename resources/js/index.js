@@ -31,7 +31,6 @@ function updatePage(page) {
         let td = document.createElement("td");
         let input = document.createElement("input");
         input.classList.add('input-description');
-        //input.id = "input-description" + taskItem.id;
         input.value = taskItem.description;
 
         input.addEventListener('change', e => {

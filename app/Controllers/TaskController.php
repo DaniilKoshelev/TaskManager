@@ -8,30 +8,28 @@ use App\Task;
 class TaskController extends Controller
 {
     public function get() {
-        return $this->sendJsonResponse(Task::getPage($this->requestJSON->page, $this->requestJSON->sort));
+        $request = $this->getRequestDataFromJson();
+        return $this->sendJsonResponse(Task::getPage($request['page'], $request['sort']));
     }
 
     public function create() {
-        Task::create([
-            'User' => $this->requestJSON->user,
-            'Email' => $this->requestJSON->email,
-            'Description' => $this->requestJSON->description,
-            'Status' => 0
-        ]);
+        $modelAttributes = $this->getRequestDataFromJson();
+        $modelAttributes['Status'] = 0;
+        Task::create($modelAttributes);
     }
 
     public function update() {
         if (authorized()) {
-            Task::update($this->requestJSON->id, $this->requestJSON->attributeName, $this->requestJSON->attributeValue);
+            $json = $this->getRequestDataFromJson();
+            Task::update($json['id'], $json['attributeName'], $json['attributeValue']);
         }
     }
 
     public function setTag() {
         if (!authorized()) return;
 
-        $id = $this->requestJSON->id;
-        $tagId =$this->requestJSON->tagId;
+        $request = $this->getRequestDataFromJson();
 
-        if (!Task::tagExists($id, $tagId)) Task::setTag($id, $tagId);
+        if (!Task::tagExists($request['id'], $request['tagId'])) Task::setTag($request['id'], $request['tagId']);
     }
 }
